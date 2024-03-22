@@ -26,6 +26,7 @@ export default function App() {
     setNickname(e.target.value);
   };
 
+  // 파일 선택이 변경될 때마다 실행되는 이벤트 핸들러
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -39,11 +40,11 @@ export default function App() {
       // ------------------------------------
 
       // 방법2 - 메모리 활용 방법
+      // 이전 URL이 있으면 해제
       if (imagePreviewUrl) {
         URL.revokeObjectURL(imagePreviewUrl);
-        setImagePreviewUrl("");
       }
-
+      // 새 파일에 대한 URL 생성
       const url = URL.createObjectURL(file);
       setImagePreviewUrl(url);
     }
@@ -57,10 +58,15 @@ export default function App() {
         URL.revokeObjectURL(imagePreviewUrl);
       }
     };
-  }, [imagePreviewUrl]);
+  }, [imagePreviewUrl]); // previewUrl이 변경될 때마다 useEffect가 다시 실행됩니다.
 
   const deletePreviewImage = () => {
-    setImagePreviewUrl("");
+    if (imagePreviewUrl) {
+      // 방법2에서만 필요함
+      URL.revokeObjectURL(imagePreviewUrl);
+      setImagePreviewUrl("");
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = ""; // 파일 입력 필드 초기화
     }
@@ -74,8 +80,10 @@ export default function App() {
       password,
       passwordConfirmation,
       nickname,
+      imagePreviewUrl,
     });
   };
+
   return (
     <div className="h-dvh bg-gray-50 dark:bg-gray-950">
       <div className="py-12 sm:py-16">
@@ -99,9 +107,9 @@ export default function App() {
                   id="email"
                   placeholder="m@example.com"
                   type="email"
+                  required={true}
                   value={email}
                   onChange={handleEmailInput}
-                  required={true}
                 />
               </div>
               <div className="space-y-2">
@@ -115,8 +123,8 @@ export default function App() {
                   id="password"
                   type="password"
                   required={true}
-                  value={password}
                   autoComplete="off"
+                  value={password}
                   onChange={handlePasswordInput}
                 />
               </div>
@@ -127,10 +135,10 @@ export default function App() {
                 <Input
                   id="passwordConfirmation"
                   type="password"
-                  value={passwordConfirmation}
-                  onChange={handlePasswordConfirmation}
                   required={true}
                   autoComplete="off"
+                  value={passwordConfirmation}
+                  onChange={handlePasswordConfirmation}
                 />
               </div>
               <div className="space-y-2">
@@ -138,9 +146,9 @@ export default function App() {
                 <Input
                   id="nickname"
                   placeholder="Nickname"
+                  required={true}
                   value={nickname}
                   onChange={handleNickname}
-                  required={true}
                 />
               </div>
               <div className="flex items-center space-x-6">
